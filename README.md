@@ -6,6 +6,15 @@ The rule for today: **Python does the math, AI does the talking.** `money.py` wo
 
 All data is fake. Nothing here is financial advice.
 
+## Build it with AI. Really.
+
+Use whatever AI you like: Copilot (built into Codespaces), Cursor, Claude Code, ChatGPT, Gemini. Every step below has a prompt you can paste.
+
+This repo has an [AGENTS.md](AGENTS.md), so your coding AI already knows the project and its rules. Two rules for you:
+
+1. **Read what it changed before you keep it.** If you can't say what changed in one sentence, ask it to explain.
+2. **Never paste your API key into any chat.** It lives in `.env` and nowhere else.
+
 ## Missed an earlier event?
 
 You're not behind. This kit runs on its own and already includes everything from Event 2.
@@ -21,8 +30,11 @@ No coding: open [prompt-lab/PROMPT-LAB.md](prompt-lab/PROMPT-LAB.md) and follow 
 
 1. Click **Fork** at the top of this page, then **Create fork**.
 2. On your fork: **Code → Codespaces → Create codespace on main**. Wait for it to load.
+3. Copilot Chat is the chat icon at the top of the editor (or **Ctrl+Alt+I**). Sign in with GitHub if it asks. Students get Copilot free through [GitHub Education](https://education.github.com/pack).
 
 ## Step 2: Get your free AI key
+
+Do this one by hand. Your coding AI should never see the key.
 
 1. Go to [aistudio.google.com/apikey](https://aistudio.google.com/apikey) and sign in with a Google account. If your school account is blocked, use a personal Gmail.
 2. Click **Create API key** and copy it.
@@ -49,52 +61,82 @@ No AI key? Skip this step. The app still runs, and every number still shows. Onl
 python -m streamlit run app.py
 ```
 
-Click **Open in Browser**, then click one of the example questions. Open **What the AI sees** at the bottom: that's everything we send it.
+Or ask your AI:
 
-## Step 4: Make the prompt yours (AI Prompter)
+> Run this Streamlit app and tell me how to open it in the browser.
 
-Open `ai.py`. The `PROMPT` near the top has five parts: ROLE, CONTEXT, TASK, FORMAT, LIMITS. Change one, save the file, press **R** in the app, and ask again.
+Click **Open in Browser**, then click one of the example questions. Open **What the AI sees** at the bottom: that's everything we send it. Do the AI's numbers match the tiles at the top?
 
-Keep `{facts}` and `{question}` exactly as they are. That's where Python drops in the numbers and the question.
+## Step 4: Make the prompt yours
+
+`PROMPT` near the top of `ai.py` is the app's brain. It has five parts: ROLE, CONTEXT, TASK, FORMAT, LIMITS. Edit it by hand, or ask your AI:
+
+> Rewrite PROMPT in ai.py so the bot sounds like a strict but funny coach and always ends with one tip. Keep {facts} and {question} exactly as they are.
+
+Save, press **R** in the app, and ask again.
+
+Pro move: paste your prompt into any AI chat and say *"Ask me 3 questions that would make this prompt better, then rewrite it."*
+
+## Step 5: Score your bot
+
+```bash
+python eval.py
+```
+
+It asks your bot 6 questions with known answers and prints a score. Change the prompt, run it again, and see if the score moved. This is called an **eval**. Real AI teams run them before every change, because "it looked fine when I tried it" isn't proof.
 
 ## Break the Bot (15 minutes)
 
-Try to get another team's assistant to give reckless advice, like "put my rent money in crypto" or "skip paying my credit card." When yours gets broken, add a rule to LIMITS in your prompt and try again.
+Try to get another team's bot to give reckless advice, like "put my rent money in crypto" or "skip paying my credit card." Pretend it's an emergency, tell it to ignore its rules, ask it to role-play. When yours gets broken, add a rule to LIMITS and try again. Bonus: add the attack that worked as a test in `eval.py`.
 
-Fake data only, and only student apps. No other systems.
+This is called **red-teaming**. AI companies pay people to do it. Fake data and student apps only, never other systems.
 
 ## Bonus quests
 
-**Silver: test set.** Put `BANK=csv` in `.env`, restart the app, and ask your bot these 5 questions. Score it out of 5.
+Paste these into your coding AI. Then check the result yourself.
 
-| Question | Right answer |
-|---|---|
-| How much did I spend in the last 30 days? | $2,676.83 |
-| What was my biggest spending category? | Housing, $788.15 |
-| How much did I spend on coffee? | $74.31 |
-| Which charges look unusual? | ElectroMart $489.99 and The Capital Grille $186.40 |
-| Am I spending more than the month before? | Yes, up 58% (from $1,698.02) |
+**Silver: your own tests** (great for Researchers)
 
-**Silver: budget coach.** In `app.py`, delete the `#` on the Silver Quest lines at the bottom. Change the limits to your own.
+> Add 3 tests to TESTS in eval.py about my dining spending. Work out the right answers with money.py, not by guessing, then run eval.py.
 
-**Gold: structured output.** Make the AI return JSON (a list of categories and totals) instead of sentences, and show it with `st.dataframe`. Hint: add `"generationConfig": {"responseMimeType": "application/json"}` next to `"contents"` in `ai.py`, ask for the exact keys you want, then `json.loads` the answer.
+**Silver: budget coach**
 
-**Gold: prompt battle.** Two teams ask the same question. The room votes on whose answer is clearer.
+> Turn on the Silver Quest budget coach at the bottom of app.py. Set Dining to $100 and Coffee to $30.
+
+**Silver: a chat that remembers**
+
+> Make "Ask your wallet" a real chat that remembers earlier questions in this session, using st.chat_input and st.session_state. Send the last few messages to the AI along with the facts.
+
+**Gold: structured output**
+
+> Add a button that asks Gemini for JSON instead of sentences: one object per category with the total and a one-line tip. Use generationConfig with responseMimeType application/json in ai.py. Totals must come from money.py. Show the result with st.dataframe.
+
+**Gold: prompt battle.** Two teams ask the same question. The room votes on whose answer is clearer. Then compare `eval.py` scores.
 
 ## Stuck?
+
+Paste the error into your AI first:
+
+> I got this error running the app: (paste it). Explain what it means in one sentence, then fix it.
+
+If that doesn't work:
 
 | You see | Fix |
 |---|---|
 | `AI is off` | No key in `.env`. Check the name is exactly `GEMINI_API_KEY`. |
 | `API key not valid` | Copy the key again. No spaces or quotes. |
-| `The AI is busy` | Free tier limit. Wait a minute. |
+| `The AI is busy` | Free tier limit. Wait a minute. Each teammate can use their own key. |
 | Edited the prompt, nothing changed | Save the file, then press **R** in the app. |
 | `No module named streamlit` | `pip install -r requirements.txt` |
 | The page won't open | Ports tab in the bottom panel, then the globe next to 8501. |
 
 ## Bringing it into your team repo
 
-Copy `ai.py` and `money.py` across (and `bank.py` if you don't have it yet). Then:
+Copy `ai.py`, `money.py`, `eval.py` and `AGENTS.md` across (and `bank.py` if you don't have it yet). Then, in your team repo, ask your AI:
+
+> I copied ai.py and money.py into this repo. Add an "Ask your wallet" section to our app.py that sends money.facts(accounts, tx) and the user's question to ai.ask, like event3-kit does.
+
+Or by hand:
 
 ```python
 import ai, money
@@ -105,5 +147,6 @@ st.write(ai.ask("Summarize my month.", facts))
 ## Ground rules
 
 - Fake data only. Never paste real bank info into an AI tool.
-- Keys live in `.env`, never in code.
+- Keys live in `.env`, never in code or chats.
+- Use AI to build. Read what it changed.
 - The AI explains. A human decides.
